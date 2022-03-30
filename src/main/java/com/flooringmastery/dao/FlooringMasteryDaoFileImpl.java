@@ -57,7 +57,6 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
             // go through each Orders_ txt file and set in map
             loadAnOrderData(orderFileList.get(i), dateFromList.get(i));     
         }
-        
     }
 
 
@@ -128,51 +127,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         scanner.close();
     }
 
-    @Override
-    public void saveAllOrderData() throws FlooringMasteryPersistenceException{
-      
-        File orderDir = new File(ORDERDIR);
-        File[] filelist = orderDir.listFiles();
-        for (File file : filelist) {
-            if (!file.isDirectory()) {
-                file.delete();
-            }
-        }
-
-        PrintWriter out;
-        String orderAsText;
-        List<Order> orderList = getAllOrders();
-
-        // groups order by order date
-        Map<String, List<Order>> fileMap = orderList.stream().collect(Collectors.groupingBy(order -> order.getOrderDate()));
-        for (String date : fileMap.keySet()) {
-            List<Order> orderListPerDate = fileMap.get(date);
-
-            String filename = "Orders_" + date + ".txt";    // write to an individual order file
-            String filepath = ORDERDIR + filename;          // data/Order/ + filepath
-
-            // open file
-            try {
-                out = new PrintWriter(new FileWriter(filepath));
-            } catch (IOException e) {
-                throw new FlooringMasteryPersistenceException(
-                        "Could not write order data to file.", e);
-            }
-
-            // write the header
-            out.println(HEADER);    
-
-            // write the order into the txt file
-            for (Order currentOrder : orderListPerDate) {
-                orderAsText = marshallOrder(currentOrder);
-                out.println(orderAsText);
-                // force PrintWriter to write line to the file
-                out.flush();
-            }
-
-            out.close();
-        }
-    }
+   
 
     private String marshallOrder(Order anOrder) {
 

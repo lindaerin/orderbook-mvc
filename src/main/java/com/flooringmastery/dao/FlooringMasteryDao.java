@@ -11,7 +11,6 @@ public interface FlooringMasteryDao {
 
     // Order addOrder(Order order);
 
-    void saveAllOrderData() throws FlooringMasteryPersistenceException;
 
 
 }
