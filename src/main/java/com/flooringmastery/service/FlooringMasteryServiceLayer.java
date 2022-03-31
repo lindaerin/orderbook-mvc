@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.flooringmastery.dao.FlooringMasteryPersistenceException;
 import com.flooringmastery.dto.Order;
+import com.flooringmastery.dto.Product;
 
 public interface FlooringMasteryServiceLayer {
 
@@ -11,8 +12,13 @@ public interface FlooringMasteryServiceLayer {
 
     List<Order> getOrderForADate(String orderDate) throws FlooringMasteryPersistenceException;
 
-    void removeSelectedOrder();
+    void removeSelectedOrder(int removedOrderNumber) throws FlooringMasteryPersistenceException;
 
-    // void loadAllData() throws FlooringMasteryPersistenceException;
-    
+    int getNewOrderNumber() throws FlooringMasteryPersistenceException;
+
+    Order processNewOrder(Order newOrder) throws FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput;
+
+    List<Product> getProductList() throws FlooringMasteryPersistenceException;
+
+    void addNewOrder(Order processedOrder) throws FlooringMasteryPersistenceException;
 }
