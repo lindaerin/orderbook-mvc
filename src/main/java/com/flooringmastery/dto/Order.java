@@ -9,7 +9,6 @@ public class Order {
     private BigDecimal taxRate;
     private String productType;
     private BigDecimal area;
-    //private LocalDate orderDate;
     private String orderDate;
     private BigDecimal costPerSquareFoot;
     private BigDecimal laborCostPerSquareFoot;

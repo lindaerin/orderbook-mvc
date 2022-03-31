@@ -1,6 +1,8 @@
 package com.flooringmastery.ui;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
+
 
 public class UserIOConsoleImpl implements UserIO{
     Scanner console = new Scanner(System.in);
@@ -16,7 +18,7 @@ public class UserIOConsoleImpl implements UserIO{
         int num = 0;
         while (invalidInput) {
             try {
-                System.out.println(msgPrompt);
+                System.out.print(msgPrompt);
                 String stringValue = console.nextLine();
                 num = Integer.parseInt(stringValue);
                 invalidInput = false;
@@ -41,8 +43,27 @@ public class UserIOConsoleImpl implements UserIO{
 
     @Override
     public String readString(String msgPrompt) {
-        System.out.println(msgPrompt);
+        System.out.print(msgPrompt);
         return console.nextLine();
+    }
+
+    @Override
+    public BigDecimal readBigDecimal(String prompt) {
+        BigDecimal bigDecimalInput = null;
+        boolean invalidInput = true;
+
+        while (invalidInput) {
+            try {
+                System.out.print(prompt);
+                String stringInput = console.nextLine();
+                bigDecimalInput = new BigDecimal(stringInput);
+                invalidInput = false;
+            } catch (NumberFormatException e) {
+                this.print("Error: Cannot be blank"); 
+                
+            }
+        }
+        return bigDecimalInput;
     }
 
 }
