@@ -38,8 +38,8 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     String BACKUPPATH;
 
     String HEADER = "OrderNumber,CustomerName,State,TaxRate,ProductType" +
-    ",Area,CostPerSquareFoot,LaborCostPerSquareFoot" +
-    ",MaterialCost,LaborCost,Tax,Total";
+            ",Area,CostPerSquareFoot,LaborCostPerSquareFoot" +
+            ",MaterialCost,LaborCost,Tax,Total";
 
     public FlooringMasteryDaoFileImpl() {
         BASEDATADIR = "data/";
@@ -58,7 +58,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     @Override
     public Order getSpecifiedOrder(int orderNumber) throws FlooringMasteryPersistenceException {
         loadAllData();
-        return orderMap.get(orderNumber);   
+        return orderMap.get(orderNumber);
     }
 
     @Override
@@ -221,18 +221,17 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         DateFormat targetFormat = new SimpleDateFormat("MM-dd-yyyy");
         String date = anOrder.getOrderDate();
         Date orderDate = new Date();
-        
+
         try {
             orderDate = formatter.parse(date);
         } catch (ParseException e) {
-           
+
             e.printStackTrace();
         }
 
         String formattedDate = targetFormat.format(orderDate);
         // String convertedDate = formatter.format(formattedDate);
 
-       
         String orderAsText = anOrder.getOrderNumber() + DELIMITER;
         orderAsText += anOrder.getCustomerName() + DELIMITER;
         orderAsText += anOrder.getState() + DELIMITER;
@@ -244,9 +243,9 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         orderAsText += anOrder.getMaterialCost() + DELIMITER;
         orderAsText += anOrder.getLaborCost() + DELIMITER;
         orderAsText += anOrder.getTax() + DELIMITER;
-        orderAsText += anOrder.getTotal()+ DELIMITER;
+        orderAsText += anOrder.getTotal() + DELIMITER;
         orderAsText += formattedDate;
-        
+
         return orderAsText;
     }
 
@@ -407,14 +406,18 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 
         try {
             out = new PrintWriter(new FileWriter(filepath));
-        } catch(IOException e){
+        } catch (IOException e) {
             throw new FlooringMasteryPersistenceException("Could not save to backup file", e);
         }
 
-        out.println(HEADER);
+        String EXPORTHEADER = "OrderNumber,CustomerName,State,TaxRate,ProductType" +
+                ",Area,CostPerSquareFoot,LaborCostPerSquareFoot" +
+                ",MaterialCost,LaborCost,Tax,Total,OrderDate";
+
+        out.println(EXPORTHEADER);
 
         // write everything in orderList to data export file
-        for(Order order : orderList){
+        for (Order order : orderList) {
             orderAsText = marshallOrder(order);
             out.println(orderAsText);
             out.flush();
