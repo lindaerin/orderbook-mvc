@@ -34,8 +34,8 @@ public class FlooringMasteryView {
         return io.readString("Enter order date in mmddyyyy format: ");
     }
 
-    public int getRemoveOrderNumber() {
-        return io.readInt("\nEnter order number to be removed: ");
+    public int getOrderNumber(String option) {
+        return io.readInt("\nEnter order number to " + option + ": ");
     }
 
     public void displayOrders(List<Order> getOrdersBasedOnDate) {
@@ -53,9 +53,9 @@ public class FlooringMasteryView {
             BigDecimal tax = order.getTax();
             BigDecimal total = order.getTotal();
 
-            io.print("\nOrder number:" + orderNumber + " Customer Name:" + customerName
+            io.print("\nOrder number: " + orderNumber + "\n" + "Customer Name:" + customerName
                     + " State:" + state + " Tax Rate:" + taxRate + " Product Type:" + productType + " Area:" + area
-                    + " Cost per Square Foot:" + costPerSquareFoot + "\n" + "Labor cost per Square Foot:"
+                    + "\n" + "Cost per Square Foot:" + costPerSquareFoot + " Labor cost per Square Foot:"
                     + laborCostPerSquareFoot + " Material cost:" + materialCost + " Labor cost:" + laborCost
                     + " Tax:" + tax + " Total:" + total);
         }
@@ -106,15 +106,40 @@ public class FlooringMasteryView {
     public void showOrderSummary(Order order) {
         io.print("\n===Order Summary===");
         String orderInfo = String.format(
-                "Customer Name: %s \nState: %s \nProduct: %s \nArea: %s\nMaterial Cost: %s \nLabor Cost: %s \nTax: %s \nTotal: %s",
+                "Customer Name: %s \nState: %s \nProduct: %s \nArea: %s\nMaterial Cost: %s \nLabor Cost: %s \nTax: %s \nTotal: %s\n",
                 order.getCustomerName(), order.getState(), order.getProductType(), order.getArea(),
                 order.getMaterialCost(), order.getLaborCost(), order.getTax(), order.getTotal());
 
         io.print(orderInfo);
     }
 
-    public String placeOrderPrompt() {
-        return io.readString("Would you like to place the order [Y/N]: ");
+
+    public String orderPrompt(String option){
+        switch(option) {
+            case "add":
+                return io.readString("Would you like to place the order [y/n]: ");
+            case "remove":
+                return io.readString("Are you sure you want to remove this order [y/n]: ");
+            case "edit":
+                return io.readString("Are you sure you want to make these edits [y/n]: ");
+            default:
+                return "";
+        }
+    }
+
+    public String getNewFields(Order orderToEdit, int fieldNumber) {
+        switch (fieldNumber) {
+            case 1:
+                return io.readString("Enter customer name (" + orderToEdit.getCustomerName() + "): ");
+            case 2:
+                return io.readString("Enter state (" + orderToEdit.getState() + ")");
+            case 3:
+                return io.readString("Enter product type (" + orderToEdit.getProductType() + ")");
+            case 4:
+                return io.readString("Enter area (" + orderToEdit.getArea() + ")");
+            default:
+                return "";
+        }
     }
 
 }

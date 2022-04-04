@@ -21,4 +21,10 @@ public interface FlooringMasteryServiceLayer {
     List<Product> getProductList() throws FlooringMasteryPersistenceException;
 
     void addNewOrder(Order processedOrder) throws FlooringMasteryPersistenceException;
+
+    Order editSelectedOrder(int editOrderNumber, int i, String newField) throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput, FlooringMasteryPersistenceException;
+
+    void exportAllData() throws FlooringMasteryPersistenceException;
+
+    Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException;
 }

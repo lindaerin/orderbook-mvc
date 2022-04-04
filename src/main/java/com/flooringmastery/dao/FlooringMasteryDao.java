@@ -22,5 +22,11 @@ public interface FlooringMasteryDao {
 
     Order addAnOrder(Order order) throws FlooringMasteryPersistenceException;
 
+    Order editOrder(int orderNumber, int fieldNumber, String newField) throws FlooringMasteryPersistenceException;
+
+    void exportAllData() throws FlooringMasteryPersistenceException;
+
+    Order getSpecifiedOrder(int orderNumber) throws FlooringMasteryPersistenceException;
+
 
 }

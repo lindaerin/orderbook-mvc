@@ -59,6 +59,12 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     }
 
     @Override
+    public void addNewOrder(Order order) throws FlooringMasteryPersistenceException {
+        dao.addAnOrder(order);
+        
+    }
+
+    @Override
     public Order processNewOrder(Order newOrder)
             throws FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
 
@@ -122,7 +128,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 
         try {
             orderDate = LocalDate.parse(newOrder.getOrderDate(), dateFormatter);
-            // System.out.println("Order Date Parse: " + orderDate);
+
         } catch (DateTimeParseException e) {
             throw new FlooringMasteryInvalidDateInput("Invalid Order Date Format: Enter Order Date as mmddyyyy. \n");
         }
@@ -138,8 +144,39 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     }
 
     @Override
-    public void addNewOrder(Order order) throws FlooringMasteryPersistenceException {
-        dao.addAnOrder(order);
+    public Order editSelectedOrder(int orderNumber, int fieldNumber, String newField) throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput, FlooringMasteryPersistenceException {
+        Order order = new Order(0);
+
+        try {
+            
+            order = dao.editOrder(orderNumber, fieldNumber, newField);
+
+            validateNewOrderFields(order); 
+
+            calculateFields(order);
+
+            // System.out.println("In Service Layer");
+            // System.out.println(order.getCustomerName());
+            // System.out.println(order.getState());
+            // System.out.println(order.getProductType());
+            // System.out.println(order.getArea());
+            // System.out.println("Material Cost: " + order.getMaterialCost());
+        }
+        catch (FlooringMasteryInvalidFieldInput e) {
+            throw new FlooringMasteryInvalidFieldInput("Invalid Field.");
+       }
+       return order;
+    }
+
+
+    @Override
+    public void exportAllData() throws FlooringMasteryPersistenceException {
+        dao.exportAllData();
+    }
+
+    @Override
+    public Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException {
+        return dao.getSpecifiedOrder(orderNumber);
         
     }
 

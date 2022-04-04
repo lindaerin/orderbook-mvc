@@ -32,7 +32,11 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     String TAXPATH;
     String PRODUCTPATH;
     String BACKUPPATH;
-    
+
+    String HEADER = "OrderNumber,CustomerName,State,TaxRate,ProductType" +
+    ",Area,CostPerSquareFoot,LaborCostPerSquareFoot" +
+    ",MaterialCost,LaborCost,Tax,Total";
+
     public FlooringMasteryDaoFileImpl() {
         BASEDATADIR = "data/";
         ORDERDIR = BASEDATADIR + "Orders/";
@@ -48,6 +52,12 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     }
 
     @Override
+    public Order getSpecifiedOrder(int orderNumber) throws FlooringMasteryPersistenceException {
+        loadAllData();
+        return orderMap.get(orderNumber);   
+    }
+
+    @Override
     public List<Order> getAllOrders() throws FlooringMasteryPersistenceException {
         loadAllData();
         return new ArrayList<Order>(orderMap.values());
@@ -60,7 +70,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         writeOrderData();
 
         return newOrder;
-        
+
     }
 
     @Override
@@ -68,7 +78,6 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         loadAllData();
         orderMap.remove(removedOrderNumber);
         writeOrderData();
-
     }
 
     private void loadAllOrderData() throws FlooringMasteryPersistenceException {
@@ -106,7 +115,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 
         try {
             // get all files in the Orders directory
-            fileList = orderDirObj.listFiles(); 
+            fileList = orderDirObj.listFiles();
 
             // add to list only if the file starts with Orders_
             if (fileList != null) {
@@ -121,7 +130,6 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 
         return orderFiles;
     }
-
 
     /// ==== LOAD ORDER TAX PRODUCT
 
@@ -155,17 +163,15 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 
     @Override
     public void writeOrderData() throws FlooringMasteryPersistenceException {
-        String HEADER = "OrderNumber,CustomerName,State,TaxRate,ProductType" +
-        ",Area,CostPerSquareFoot,LaborCostPerSquareFoot" +
-        ",MaterialCost,LaborCost,Tax,Total";
 
         // if the last order number is deleted from text file remove the text file
-        File orderDir = new File(ORDERDIR);         
-        File[] filelist = orderDir.listFiles();     // get all files in Orders dir
+        File orderDir = new File(ORDERDIR);
+        File[] filelist = orderDir.listFiles();
 
+        // iterate through all the files in fileList -> contains all the txt file
         for (File file : filelist) {
             if (!file.isDirectory()) {
-                file.delete();
+                file.delete(); // if file is empty delete
             }
         }
 
@@ -173,7 +179,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         String orderAsText;
         List<Order> orderList = getAllOrders();
 
-        // group orders by the order date
+        // group orders by the order date.
         Map<String, List<Order>> fileMap = orderList.stream()
                 .collect(Collectors.groupingBy(order -> order.getOrderDate()));
         for (String date : fileMap.keySet()) {
@@ -343,6 +349,58 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     @Override
     public Product getProduct(String productType) {
         return productMap.get(productType);
+    }
+
+    @Override
+    public Order editOrder(int orderNumber, int fieldNumber, String newField)
+            throws FlooringMasteryPersistenceException {
+        // loadAllData();
+        Order order = orderMap.get(orderNumber);
+
+        if (order != null) {
+            switch (fieldNumber) {
+                case 1:
+                    order.setCustomerName(newField);
+                    break;
+                case 2:
+                    order.setState(newField);
+                    break;
+                case 3:
+                    order.setProductType(newField);
+                    break;
+                case 4:
+                    order.setArea(new BigDecimal(newField));
+                    break;
+            }
+        }
+        writeOrderData();
+        return order;
+    }
+
+    @Override
+    public void exportAllData() throws FlooringMasteryPersistenceException {
+        PrintWriter out;
+
+        String orderAsText;
+        String filepath = BACKUPPATH;
+        List<Order> orderList = getAllOrders();
+
+        try {
+            out = new PrintWriter(new FileWriter(filepath));
+        } catch(IOException e){
+            throw new FlooringMasteryPersistenceException("Could not save to backup file", e);
+        }
+
+        out.println(HEADER);
+
+        // write everything in orderList to data export file
+        for(Order order : orderList){
+            orderAsText = marshallOrder(order);
+            out.println(orderAsText);
+            out.flush();
+        }
+
+        out.close();
     }
 
 }

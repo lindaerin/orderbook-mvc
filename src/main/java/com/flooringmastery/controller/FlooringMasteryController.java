@@ -21,6 +21,7 @@ public class FlooringMasteryController {
 
     public void run() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
             FlooringMasteryInvalidFieldInput {
+
         boolean keepGoing = true;
         int menuSelection = 0;
 
@@ -37,13 +38,13 @@ public class FlooringMasteryController {
                         addAnOrder();
                         break;
                     case 3:
-                        System.out.print("Edit Orders");
+                        editAnOrder();
                         break;
                     case 4:
                         removeAnOrder();
                         break;
                     case 5:
-                        System.out.print("Export Data");
+                        exportAllData();
                         break;
                     case 6:
                         keepGoing = false; // quit program
@@ -61,20 +62,79 @@ public class FlooringMasteryController {
 
     }
 
-    private void displayOrders() throws FlooringMasteryPersistenceException {
-        // ask user for order date then display order for that date
-        // if order does not exist display error and return to main menu
+    private void exportAllData() {
+        view.displayBanner("Export All Data");
 
-        view.displayBanner("Display Orders");
-        String orderDate = view.getOrderDate();
-        List<Order> getOrdersBasedOnDate = service.getOrderForADate(orderDate);
-
-        if (getOrdersBasedOnDate.size() > 0) {
-            view.displayOrders(getOrdersBasedOnDate);
-        } else {
-            view.displayMessage("No existing orders for " + orderDate);
+        try {
+            service.exportAllData();
+        } catch (FlooringMasteryPersistenceException e) {
+            view.displayErrorMessage(e.getMessage());
         }
-        
+
+        view.displayMessage("Successfully Exported Data to file.");
+    }
+
+    private void editAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
+            FlooringMasteryInvalidFieldInput {
+        view.displayBanner("Edit An Order");
+
+        // ask for date
+        // String orderDate = getOrderDate();
+
+        // get list of orders for that date
+        List<Order> getOrdersBasedOnDate = getOrderListForDate();
+
+        view.displayMessage("\nList of orders for specified date.");
+        view.displayOrders(getOrdersBasedOnDate);
+
+        int editOrderNumber = view.getOrderNumber("edit");
+        Order order = service.getOrder(editOrderNumber);
+
+        if(order == null){
+            view.displayErrorMessage("Order Number does not exist. ");
+        } else {
+            view.displayBanner("Editing Order Number " + editOrderNumber);
+            getNewFields(order, editOrderNumber);
+            view.showOrderSummary(order);
+            getAnswerToOrderPrompt("edit");
+        }
+
+        // prompt user to save edit: yes -> save no -> main menu
+
+    }
+
+    private void getNewFields(Order orderToEdit, int editOrderNumber)
+            throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput,
+            FlooringMasteryPersistenceException {
+        String newField = "";
+        boolean hasError = false;
+
+        for (int i = 0; i <= 4; i++) {
+
+            do {
+                try {
+                    newField = view.getNewFields(orderToEdit, i);
+
+                    if (!newField.equals("")) {
+                        service.editSelectedOrder(editOrderNumber, i, newField);
+                    }
+                    hasError = false;
+
+                } catch (FlooringMasteryInvalidFieldInput e) {
+                    hasError = true;
+                }
+            } while (hasError);
+
+        }
+
+        view.displayMessage("Complete: Order has been edited");
+    }
+
+    private void displayOrders() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
+            FlooringMasteryInvalidFieldInput {
+        view.displayBanner("Display Orders");
+        List<Order> getOrdersBasedOnDate = getOrderListForDate();
+        view.displayOrders(getOrdersBasedOnDate);
     }
 
     private void addAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
@@ -93,6 +153,7 @@ public class FlooringMasteryController {
 
         boolean hasError = true;
 
+        // get new order and validate fields
         do {
             try {
                 Order newOrder = view.getNewOrderInfo(new Order(newOrderNumber));
@@ -106,64 +167,95 @@ public class FlooringMasteryController {
 
         view.showOrderSummary(processedOrder);
 
-        do {
-            String answer = view.placeOrderPrompt();
-
-            if (answer.equals("y")) {
-                service.addNewOrder(processedOrder);
-                view.displayMessage("\nSuccessfully added Order");
-                hasError = false;
-            } else if (answer.equals("n")) {
-                run();
-                hasError = false;
-            } else {
-                view.displayMessage("Please enter [y/n] as answer.");
-                hasError = true;
-            }
-        } while (hasError);
-
+        // loop to ask user whether they want to place order
+        getAnswerToOrderPrompt("add");
+        service.addNewOrder(processedOrder);
+        view.displayMessage("\nSuccessfully Added Order");
     }
 
-    private void removeAnOrder() throws FlooringMasteryPersistenceException {
+    private void removeAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
+            FlooringMasteryInvalidFieldInput {
 
         view.displayBanner("Remove An Order");
 
-        String orderDate = view.getOrderDate();
+        List<Order> getOrdersBasedOnDate = getOrderListForDate();
 
-        // get all the orders for the date user input
-        List<Order> getOrdersBasedOnDate = service.getOrderForADate(orderDate);
+        view.displayMessage("\nList of orders for specified date.");
+        view.displayOrders(getOrdersBasedOnDate);
 
-        // if the list size is 0 order date does not exist
-        if (getOrdersBasedOnDate.size() == 0) {
-            view.displayErrorMessage("Order Date does not exist.");
-        }
+        int removedOrderNumber;
 
-        if (getOrdersBasedOnDate.size() > 0) {
-            view.displayMessage("\nList of orders for " + orderDate);
-            view.displayOrders(getOrdersBasedOnDate);
+        Order order;
+        boolean hasError = false;
 
-            int removedOrderNumber = view.getRemoveOrderNumber();
-            int currentOrderNumber = 0;
-
-            for (int i = 0; i < getOrdersBasedOnDate.size(); i++) {
-                // get the order number of the orders in list
-                currentOrderNumber = getOrdersBasedOnDate.get(i).getOrderNumber();
-
-                // check order number equals to the user input:
-                if (currentOrderNumber == removedOrderNumber) {
-                    service.removeSelectedOrder(removedOrderNumber);
-                    view.displayMessage("Successfully Removed Order Number: " + currentOrderNumber);
-                    break;
-                } else {
-                    // if order number to be removed does not exist set num to 0
-                    currentOrderNumber = 0;
-                }
-            }
-
-            if (currentOrderNumber == 0) {
+        do {
+            removedOrderNumber = view.getOrderNumber("remove");
+            order = service.getOrder(removedOrderNumber);
+            if(order == null){
                 view.displayErrorMessage("Order Number does not exist. ");
+                hasError = true;
+            } else {
+                getAnswerToOrderPrompt("remove");
+                service.removeSelectedOrder(removedOrderNumber);
+                view.displayMessage("Successfully Removed Order Number: " + order.getOrderNumber());
             }
-        }
+
+        }while(hasError);
+
+    }
+
+    private String getOrderDate() {
+        String orderDate = view.getOrderDate();
+        return orderDate;
+    }
+
+    private List<Order> getOrderListForDate() throws FlooringMasteryPersistenceException,
+            FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
+
+        List<Order> getOrdersBasedOnDate;
+        boolean hasError = false;
+        
+        do {
+            String orderDate = getOrderDate();
+            getOrdersBasedOnDate = service.getOrderForADate(orderDate);
+
+            if (getOrdersBasedOnDate.size() == 0) {
+                view.displayErrorMessage("Order Date does not exist.");
+                hasError = true;
+            }
+            else{
+                hasError = false;
+            }
+
+        }while(hasError);
+
+
+
+        return getOrdersBasedOnDate;
+    }
+
+    private void getAnswerToOrderPrompt(String input) throws FlooringMasteryPersistenceException,
+            FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
+        boolean hasError = false;
+        ;
+        do {
+            String answer = view.orderPrompt(input);
+
+            switch (answer) {
+                case "y": // if yes continue back to method
+                    break;
+                case "n":
+                    view.displayMessage("\nAction cancelled. Going Back to Main Menu.");
+                    run(); // if no return to main menu
+                    break;
+                default:
+                    view.displayMessage("Please enter [y/n] as answer.");
+                    hasError = true;
+                    break;
+            }
+
+        } while (hasError);
+
     }
 
     private int getMenuSelection() {
@@ -171,7 +263,7 @@ public class FlooringMasteryController {
     }
 
     private void exitMessage() {
-        view.displayMessage("Exit: GoodBye!");
+        view.displayMessage("Quitting Program...Goodbye!");
     }
 
     private void unknownCommand() {
