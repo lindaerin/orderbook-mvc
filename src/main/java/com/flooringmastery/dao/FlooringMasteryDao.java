@@ -28,6 +28,4 @@ public interface FlooringMasteryDao {
     void exportAllData() throws FlooringMasteryPersistenceException;
 
     Order getSpecifiedOrder(int orderNumber) throws FlooringMasteryPersistenceException;
-
-
 }

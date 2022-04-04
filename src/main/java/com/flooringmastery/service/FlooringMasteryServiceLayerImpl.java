@@ -41,6 +41,28 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         return dao.getAllOrders();
     }
 
+    @Override
+    public void removeSelectedOrder(int removedOrderNumber) throws FlooringMasteryPersistenceException {
+        dao.removeAnOrder(removedOrderNumber);
+    }
+
+    @Override
+    public int getNewOrderNumber() throws FlooringMasteryPersistenceException {
+        int newOrderNumber = 0;
+        int currentOrderNumber = 1;
+
+        List<Order> allOrderList = dao.getAllOrders();
+
+        for (Order order : allOrderList) {
+            currentOrderNumber = order.getOrderNumber();
+
+            if (currentOrderNumber > newOrderNumber) {
+                newOrderNumber = currentOrderNumber;
+            }
+        }
+        return newOrderNumber + 1;
+    }
+
 
     @Override
     public void addNewOrder(Order order) throws FlooringMasteryPersistenceException {
@@ -58,37 +80,6 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         return newOrder;
     }
 
-
-    private Order calculateFields(Order newOrder) {
-        String state = newOrder.getState();
-        String productType = newOrder.getProductType();
-
-        Tax tax = dao.getTax(state);
-        Product product = dao.getProduct(productType);
-
-        BigDecimal area = newOrder.getArea();
-        BigDecimal costPerSquareFoot = product.getCostPerSquareFoot();
-        BigDecimal laborCostPerSquareFoot = product.getLaborCostPerSquareFoot();
-        BigDecimal taxRate = tax.getTaxRate();
-        BigDecimal hundred = new BigDecimal(100);
-
-        BigDecimal materialCost = area.multiply(costPerSquareFoot).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal laborCost = area.multiply(laborCostPerSquareFoot).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal calculatedTax = (materialCost.add(laborCost)).multiply(taxRate.divide(hundred)).setScale(2,
-                RoundingMode.HALF_UP);
-        BigDecimal calculatedTotal = materialCost.add(laborCost).add(calculatedTax).setScale(2, RoundingMode.HALF_UP);
-
-        newOrder.setTaxRate(taxRate);
-        newOrder.setCostPerSquareFoot(costPerSquareFoot);
-        newOrder.setLaborCostPerSquareFoot(laborCostPerSquareFoot);
-
-        newOrder.setMaterialCost(materialCost);
-        newOrder.setLaborCost(laborCost);
-        newOrder.setTax(calculatedTax);
-        newOrder.setTotal(calculatedTotal);
-
-        return newOrder;
-    }
 
     private void validateNewOrderFields(Order newOrder)
             throws FlooringMasteryInvalidDateInputException, FlooringMasteryInvalidFieldInputException {
@@ -120,6 +111,37 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         if (orderDate.isBefore(LocalDate.now())) {
             throw new FlooringMasteryInvalidDateInputException("The Order Date must be in the future. \n");
         }
+    }
+
+    private Order calculateFields(Order newOrder) {
+        String state = newOrder.getState();
+        String productType = newOrder.getProductType();
+
+        Tax tax = dao.getTax(state);
+        Product product = dao.getProduct(productType);
+
+        BigDecimal area = newOrder.getArea();
+        BigDecimal costPerSquareFoot = product.getCostPerSquareFoot();
+        BigDecimal laborCostPerSquareFoot = product.getLaborCostPerSquareFoot();
+        BigDecimal taxRate = tax.getTaxRate();
+        BigDecimal hundred = new BigDecimal(100);
+
+        BigDecimal materialCost = area.multiply(costPerSquareFoot).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal laborCost = area.multiply(laborCostPerSquareFoot).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal calculatedTax = (materialCost.add(laborCost)).multiply(taxRate.divide(hundred)).setScale(2,
+                RoundingMode.HALF_UP);
+        BigDecimal calculatedTotal = materialCost.add(laborCost).add(calculatedTax).setScale(2, RoundingMode.HALF_UP);
+
+        newOrder.setTaxRate(taxRate);
+        newOrder.setCostPerSquareFoot(costPerSquareFoot);
+        newOrder.setLaborCostPerSquareFoot(laborCostPerSquareFoot);
+
+        newOrder.setMaterialCost(materialCost);
+        newOrder.setLaborCost(laborCost);
+        newOrder.setTax(calculatedTax);
+        newOrder.setTotal(calculatedTotal);
+
+        return newOrder;
     }
 
 
@@ -163,27 +185,6 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         }
     }
 
-    @Override
-    public void removeSelectedOrder(int removedOrderNumber) throws FlooringMasteryPersistenceException {
-        dao.removeAnOrder(removedOrderNumber);
-    }
-
-    @Override
-    public int getNewOrderNumber() throws FlooringMasteryPersistenceException {
-        int newOrderNumber = 0;
-        int currentOrderNumber = 1;
-
-        List<Order> allOrderList = dao.getAllOrders();
-
-        for (Order order : allOrderList) {
-            currentOrderNumber = order.getOrderNumber();
-
-            if (currentOrderNumber > newOrderNumber) {
-                newOrderNumber = currentOrderNumber;
-            }
-        }
-        return newOrderNumber + 1;
-    }
 
 
     @Override

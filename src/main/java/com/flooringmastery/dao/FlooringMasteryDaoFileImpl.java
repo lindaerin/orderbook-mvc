@@ -74,7 +74,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         writeOrderData();
 
         return newOrder;
-
+    
     }
 
     @Override
@@ -92,7 +92,6 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         List<String> dateFromList = getDateFromList(orderFileList);
 
         for (int i = 0; i < orderFileList.size(); i++) {
-            // go through each Orders_ txt file
             loadAnOrderData(orderFileList.get(i), dateFromList.get(i));
         }
     }
@@ -120,8 +119,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         try {
             // get all files in the Orders directory
             fileList = orderDirObj.listFiles();
-
-            // add to list only if the file starts with Orders_
+            
             if (fileList != null) {
                 orderFiles = Arrays.stream(fileList).filter(
                         path -> path.getName().startsWith("Orders_")).map(
