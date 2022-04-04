@@ -374,7 +374,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     @Override
     public Order editOrder(int orderNumber, int fieldNumber, String newField)
             throws FlooringMasteryPersistenceException {
-        // loadAllData();
+        loadAllData();
         Order order = orderMap.get(orderNumber);
 
         if (order != null) {

@@ -132,11 +132,11 @@ public class FlooringMasteryView {
             case 1:
                 return io.readString("Enter customer name (" + orderToEdit.getCustomerName() + "): ");
             case 2:
-                return io.readString("Enter state (" + orderToEdit.getState() + ")");
+                return io.readString("Enter state (" + orderToEdit.getState() + "): ");
             case 3:
-                return io.readString("Enter product type (" + orderToEdit.getProductType() + ")");
+                return io.readString("Enter product type (" + orderToEdit.getProductType() + "): ");
             case 4:
-                return io.readString("Enter area (" + orderToEdit.getArea() + ")");
+                return io.readString("Enter area (" + orderToEdit.getArea() + "): ");
             default:
                 return "";
         }

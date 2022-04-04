@@ -84,19 +84,30 @@ public class FlooringMasteryController {
         view.displayMessage("\nList of orders for specified date.");
         view.displayOrders(getOrdersBasedOnDate);
 
-        int editOrderNumber = view.getOrderNumber("edit");
-        Order order = service.getOrder(editOrderNumber);
+        int editOrderNumber;
+        Order order = new Order(0);
 
-        if(order == null){
-            view.displayErrorMessage("Order Number does not exist. ");
-        } else {
-            view.displayBanner("Editing Order Number " + editOrderNumber);
-            order = getNewFields(order, editOrderNumber);
-            view.showOrderSummary(order);
-            getAnswerToOrderPrompt("edit");
-        }
+        boolean hasError = false;
 
-        // prompt user to save edit: yes -> save no -> main menu
+        do {
+            editOrderNumber = view.getOrderNumber("edit");
+            order = service.getOrder(editOrderNumber);
+
+            if(order == null){
+                view.displayErrorMessage("Order Number does not exist. ");
+                hasError = true;
+            } else {
+                view.displayBanner("Editing Order Number " + editOrderNumber);
+                order = getNewFields(order, editOrderNumber);
+                view.showOrderSummary(order);
+                getAnswerToOrderPrompt("edit");
+                view.displayMessage("\nSuccess: Order has been edited.");
+                hasError = false;
+            }
+
+        }while(hasError);
+
+
 
     }
 
@@ -126,8 +137,6 @@ public class FlooringMasteryController {
             } while (hasError);
 
         }
-
-        view.displayMessage("Complete: Order has been edited");
 
         return order;
     }
@@ -172,7 +181,7 @@ public class FlooringMasteryController {
         // loop to ask user whether they want to place order
         getAnswerToOrderPrompt("add");
         service.addNewOrder(processedOrder);
-        view.displayMessage("\nSuccessfully Added Order");
+        view.displayMessage("\nSuccess: Order has been added.");
     }
 
     private void removeAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
@@ -199,7 +208,7 @@ public class FlooringMasteryController {
             } else {
                 getAnswerToOrderPrompt("remove");
                 service.removeSelectedOrder(removedOrderNumber);
-                view.displayMessage("Successfully Removed Order Number: " + order.getOrderNumber());
+                view.displayMessage("\nSuccess: Order Number "+ order.getOrderNumber() + " has been removed. ");
             }
 
         }while(hasError);
