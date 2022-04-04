@@ -162,7 +162,6 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
             newOrder.setArea(oldOlder.getArea());
             throw new FlooringMasteryInvalidFieldInput("Enter valid Area (Min: 100sqft). \n");
         }
-
     }
 
     @Override
@@ -197,6 +196,5 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     public List<Product> getProductList() throws FlooringMasteryPersistenceException {
         return dao.getProductList();
     }
-
 
 }

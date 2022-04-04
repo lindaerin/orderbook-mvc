@@ -111,6 +111,7 @@ public class FlooringMasteryController {
 
     }
 
+
     private Order getNewFields(Order orderToEdit, int editOrderNumber)
             throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput,
             FlooringMasteryPersistenceException {
@@ -240,8 +241,6 @@ public class FlooringMasteryController {
 
         }while(hasError);
 
-
-
         return getOrdersBasedOnDate;
     }
 
@@ -252,12 +251,12 @@ public class FlooringMasteryController {
         do {
             String answer = view.orderPrompt(input);
 
-            switch (answer) {
-                case "y": // if yes continue back to method
+            switch (answer.toLowerCase()) {
+                case "y": 
                     break;
                 case "n":
                     view.displayMessage("\nAction cancelled. Going Back to Main Menu.");
-                    run(); // if no return to main menu
+                    run();
                     break;
                 default:
                     view.displayMessage("Please enter [y/n] as answer.");
