@@ -25,6 +25,12 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     }
 
     @Override
+    public Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException {
+        return dao.getSpecifiedOrder(orderNumber);
+        
+    }
+
+    @Override
     public List<Order> getOrderForADate(String orderDate) throws FlooringMasteryPersistenceException {
         List<Order> allOrderList = getAllOrders();
         return allOrderList.stream().filter(order -> order.getOrderDate().equals(orderDate))
@@ -36,27 +42,6 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         return dao.getAllOrders();
     }
 
-    @Override
-    public void removeSelectedOrder(int removedOrderNumber) throws FlooringMasteryPersistenceException {
-        dao.removeAnOrder(removedOrderNumber);
-    }
-
-    @Override
-    public int getNewOrderNumber() throws FlooringMasteryPersistenceException {
-        int newOrderNumber = 0;
-        int currentOrderNumber = 1;
-
-        List<Order> allOrderList = dao.getAllOrders();
-
-        for (Order order : allOrderList) {
-            currentOrderNumber = order.getOrderNumber();
-
-            if (currentOrderNumber > newOrderNumber) {
-                newOrderNumber = currentOrderNumber;
-            }
-        }
-        return newOrderNumber + 1;
-    }
 
     @Override
     public void addNewOrder(Order order) throws FlooringMasteryPersistenceException {
@@ -138,34 +123,68 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         }
     }
 
-    @Override
-    public List<Product> getProductList() throws FlooringMasteryPersistenceException {
-        return dao.getProductList();
-    }
 
     @Override
     public Order editSelectedOrder(int orderNumber, int fieldNumber, String newField) throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput, FlooringMasteryPersistenceException {
         Order order = new Order(0);
+        Order oldOrder = getOrder(orderNumber);
 
         try {
             
             order = dao.editOrder(orderNumber, fieldNumber, newField);
 
-            validateNewOrderFields(order); 
+            validateFields(order, oldOrder);
 
             calculateFields(order);
 
-            // System.out.println("In Service Layer");
-            // System.out.println(order.getCustomerName());
-            // System.out.println(order.getState());
-            // System.out.println(order.getProductType());
-            // System.out.println(order.getArea());
-            // System.out.println("Material Cost: " + order.getMaterialCost());
         }
         catch (FlooringMasteryInvalidFieldInput e) {
-            throw new FlooringMasteryInvalidFieldInput("Invalid Field.");
+            throw new FlooringMasteryInvalidFieldInput("Invalid input for this field.\n");
        }
        return order;
+    }
+
+
+    private void validateFields(Order newOrder, Order oldOlder) throws FlooringMasteryInvalidFieldInput {
+        if (newOrder.getCustomerName() == null) {
+            newOrder.setCustomerName(oldOlder.getCustomerName());
+            throw new FlooringMasteryInvalidFieldInput("Customer Name should not be blank. \n");
+
+        } else if (dao.getTax(newOrder.getState()) == null) {
+            newOrder.setState(oldOlder.getState());
+            throw new FlooringMasteryInvalidFieldInput("Enter valid state. \n");
+
+        } else if (dao.getProduct(newOrder.getProductType()) == null) {
+            newOrder.setProductType(oldOlder.getProductType());
+            throw new FlooringMasteryInvalidFieldInput("Enter valid product type. \n");
+
+        } else if (newOrder.getArea().compareTo(new BigDecimal("100")) < 0) {
+            newOrder.setArea(oldOlder.getArea());
+            throw new FlooringMasteryInvalidFieldInput("Enter valid Area (Min: 100sqft). \n");
+        }
+
+    }
+
+    @Override
+    public void removeSelectedOrder(int removedOrderNumber) throws FlooringMasteryPersistenceException {
+        dao.removeAnOrder(removedOrderNumber);
+    }
+
+    @Override
+    public int getNewOrderNumber() throws FlooringMasteryPersistenceException {
+        int newOrderNumber = 0;
+        int currentOrderNumber = 1;
+
+        List<Order> allOrderList = dao.getAllOrders();
+
+        for (Order order : allOrderList) {
+            currentOrderNumber = order.getOrderNumber();
+
+            if (currentOrderNumber > newOrderNumber) {
+                newOrderNumber = currentOrderNumber;
+            }
+        }
+        return newOrderNumber + 1;
     }
 
 
@@ -175,9 +194,9 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     }
 
     @Override
-    public Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException {
-        return dao.getSpecifiedOrder(orderNumber);
-        
+    public List<Product> getProductList() throws FlooringMasteryPersistenceException {
+        return dao.getProductList();
     }
+
 
 }

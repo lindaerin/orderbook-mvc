@@ -1,5 +1,6 @@
 package com.flooringmastery.dao;
 
+import java.text.ParseException;
 import java.util.List;
 
 import com.flooringmastery.dto.Order;
@@ -12,7 +13,7 @@ public interface FlooringMasteryDao {
 
     void removeAnOrder(int removedOrderNumber) throws FlooringMasteryPersistenceException;
 
-    void writeOrderData() throws FlooringMasteryPersistenceException;
+    void writeOrderData() throws FlooringMasteryPersistenceException, ParseException;
 
     Tax getTax(String state);
 

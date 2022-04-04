@@ -8,6 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -213,7 +217,22 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     }
 
     private String marshallOrder(Order anOrder) {
+        SimpleDateFormat formatter = new SimpleDateFormat("MMddyyyy");
+        DateFormat targetFormat = new SimpleDateFormat("MM-dd-yyyy");
+        String date = anOrder.getOrderDate();
+        Date orderDate = new Date();
+        
+        try {
+            orderDate = formatter.parse(date);
+        } catch (ParseException e) {
+           
+            e.printStackTrace();
+        }
 
+        String formattedDate = targetFormat.format(orderDate);
+        // String convertedDate = formatter.format(formattedDate);
+
+       
         String orderAsText = anOrder.getOrderNumber() + DELIMITER;
         orderAsText += anOrder.getCustomerName() + DELIMITER;
         orderAsText += anOrder.getState() + DELIMITER;
@@ -225,8 +244,9 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
         orderAsText += anOrder.getMaterialCost() + DELIMITER;
         orderAsText += anOrder.getLaborCost() + DELIMITER;
         orderAsText += anOrder.getTax() + DELIMITER;
-        orderAsText += anOrder.getTotal();
-
+        orderAsText += anOrder.getTotal()+ DELIMITER;
+        orderAsText += formattedDate;
+        
         return orderAsText;
     }
 

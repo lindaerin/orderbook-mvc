@@ -78,9 +78,6 @@ public class FlooringMasteryController {
             FlooringMasteryInvalidFieldInput {
         view.displayBanner("Edit An Order");
 
-        // ask for date
-        // String orderDate = getOrderDate();
-
         // get list of orders for that date
         List<Order> getOrdersBasedOnDate = getOrderListForDate();
 
@@ -94,7 +91,7 @@ public class FlooringMasteryController {
             view.displayErrorMessage("Order Number does not exist. ");
         } else {
             view.displayBanner("Editing Order Number " + editOrderNumber);
-            getNewFields(order, editOrderNumber);
+            order = getNewFields(order, editOrderNumber);
             view.showOrderSummary(order);
             getAnswerToOrderPrompt("edit");
         }
@@ -103,11 +100,12 @@ public class FlooringMasteryController {
 
     }
 
-    private void getNewFields(Order orderToEdit, int editOrderNumber)
+    private Order getNewFields(Order orderToEdit, int editOrderNumber)
             throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput,
             FlooringMasteryPersistenceException {
         String newField = "";
         boolean hasError = false;
+        Order order = new Order(0);
 
         for (int i = 0; i <= 4; i++) {
 
@@ -116,18 +114,22 @@ public class FlooringMasteryController {
                     newField = view.getNewFields(orderToEdit, i);
 
                     if (!newField.equals("")) {
-                        service.editSelectedOrder(editOrderNumber, i, newField);
+                        order = service.editSelectedOrder(editOrderNumber, i, newField);
                     }
                     hasError = false;
 
                 } catch (FlooringMasteryInvalidFieldInput e) {
                     hasError = true;
+                    view.displayErrorMessage(e.getMessage());
                 }
+
             } while (hasError);
 
         }
 
         view.displayMessage("Complete: Order has been edited");
+
+        return order;
     }
 
     private void displayOrders() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
