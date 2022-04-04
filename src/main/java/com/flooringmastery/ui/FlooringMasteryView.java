@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.flooringmastery.dto.Order;
 import com.flooringmastery.dto.Product;
-import com.flooringmastery.service.FlooringMasteryInvalidFieldInput;
+import com.flooringmastery.service.FlooringMasteryInvalidFieldInputException;
 
 public class FlooringMasteryView {
 
@@ -74,7 +74,7 @@ public class FlooringMasteryView {
         io.print("Error: " + string);
     }
 
-    public Order getNewOrderInfo(Order newOrder) throws FlooringMasteryInvalidFieldInput {
+    public Order getNewOrderInfo(Order newOrder) throws FlooringMasteryInvalidFieldInputException {
         String customerName = io.readString("Enter Customer name: ");
         String state = io.readString("Enter State Abbreviation: ");
         String productType = io.readString("Enter Product type: ");

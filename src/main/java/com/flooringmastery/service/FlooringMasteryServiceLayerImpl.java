@@ -21,7 +21,6 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 
     public FlooringMasteryServiceLayerImpl(FlooringMasteryDao dao) {
         this.dao = dao;
-
     }
 
     @Override
@@ -51,7 +50,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 
     @Override
     public Order processNewOrder(Order newOrder)
-            throws FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
+            throws FlooringMasteryInvalidDateInputException, FlooringMasteryInvalidFieldInputException {
 
         validateNewOrderFields(newOrder);        
         calculateFields(newOrder);
@@ -92,19 +91,19 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     }
 
     private void validateNewOrderFields(Order newOrder)
-            throws FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
+            throws FlooringMasteryInvalidDateInputException, FlooringMasteryInvalidFieldInputException {
 
         if (newOrder.getCustomerName().trim().length() == 0) {
-            throw new FlooringMasteryInvalidFieldInput("Customer Name should not be blank. \n");
+            throw new FlooringMasteryInvalidFieldInputException("Customer Name should not be blank. \n");
 
         } else if (dao.getTax(newOrder.getState()) == null) {
-            throw new FlooringMasteryInvalidFieldInput("Enter valid state. \n");
+            throw new FlooringMasteryInvalidFieldInputException("Enter valid state. \n");
 
         } else if (dao.getProduct(newOrder.getProductType()) == null) {
-            throw new FlooringMasteryInvalidFieldInput("Enter valid product type. \n");
+            throw new FlooringMasteryInvalidFieldInputException("Enter valid product type. \n");
 
         } else if (newOrder.getArea().compareTo(new BigDecimal("100")) < 0) {
-            throw new FlooringMasteryInvalidFieldInput("Enter valid Area (Min: 100sqft). \n");
+            throw new FlooringMasteryInvalidFieldInputException("Enter valid Area (Min: 100sqft). \n");
         }
 
         // order date needs to be in the future - convert string to localdate
@@ -115,17 +114,17 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
             orderDate = LocalDate.parse(newOrder.getOrderDate(), dateFormatter);
 
         } catch (DateTimeParseException e) {
-            throw new FlooringMasteryInvalidDateInput("Invalid Order Date Format: Enter Order Date as mmddyyyy. \n");
+            throw new FlooringMasteryInvalidDateInputException("Invalid Order Date Format: Enter Order Date as mmddyyyy. \n");
         }
 
         if (orderDate.isBefore(LocalDate.now())) {
-            throw new FlooringMasteryInvalidDateInput("The Order Date must be in the future. \n");
+            throw new FlooringMasteryInvalidDateInputException("The Order Date must be in the future. \n");
         }
     }
 
 
     @Override
-    public Order editSelectedOrder(int orderNumber, int fieldNumber, String newField) throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput, FlooringMasteryPersistenceException {
+    public Order editSelectedOrder(int orderNumber, int fieldNumber, String newField) throws FlooringMasteryInvalidFieldInputException, FlooringMasteryInvalidDateInputException, FlooringMasteryPersistenceException {
         Order order = new Order(0);
         Order oldOrder = getOrder(orderNumber);
 
@@ -138,29 +137,29 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
             calculateFields(order);
 
         }
-        catch (FlooringMasteryInvalidFieldInput e) {
-            throw new FlooringMasteryInvalidFieldInput("Invalid input for this field.\n");
+        catch (FlooringMasteryInvalidFieldInputException e) {
+            throw new FlooringMasteryInvalidFieldInputException("Invalid input for this field.\n");
        }
        return order;
     }
 
 
-    private void validateFields(Order newOrder, Order oldOlder) throws FlooringMasteryInvalidFieldInput {
+    private void validateFields(Order newOrder, Order oldOlder) throws FlooringMasteryInvalidFieldInputException {
         if (newOrder.getCustomerName() == null) {
             newOrder.setCustomerName(oldOlder.getCustomerName());
-            throw new FlooringMasteryInvalidFieldInput("Customer Name should not be blank. \n");
+            throw new FlooringMasteryInvalidFieldInputException("Customer Name should not be blank. \n");
 
         } else if (dao.getTax(newOrder.getState()) == null) {
             newOrder.setState(oldOlder.getState());
-            throw new FlooringMasteryInvalidFieldInput("Enter valid state. \n");
+            throw new FlooringMasteryInvalidFieldInputException("Enter valid state. \n");
 
         } else if (dao.getProduct(newOrder.getProductType()) == null) {
             newOrder.setProductType(oldOlder.getProductType());
-            throw new FlooringMasteryInvalidFieldInput("Enter valid product type. \n");
+            throw new FlooringMasteryInvalidFieldInputException("Enter valid product type. \n");
 
         } else if (newOrder.getArea().compareTo(new BigDecimal("100")) < 0) {
             newOrder.setArea(oldOlder.getArea());
-            throw new FlooringMasteryInvalidFieldInput("Enter valid Area (Min: 100sqft). \n");
+            throw new FlooringMasteryInvalidFieldInputException("Enter valid Area (Min: 100sqft). \n");
         }
     }
 

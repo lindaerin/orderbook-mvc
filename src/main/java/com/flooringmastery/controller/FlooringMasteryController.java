@@ -5,8 +5,8 @@ import java.util.List;
 import com.flooringmastery.dao.FlooringMasteryPersistenceException;
 import com.flooringmastery.dto.Order;
 import com.flooringmastery.dto.Product;
-import com.flooringmastery.service.FlooringMasteryInvalidDateInput;
-import com.flooringmastery.service.FlooringMasteryInvalidFieldInput;
+import com.flooringmastery.service.FlooringMasteryInvalidDateInputException;
+import com.flooringmastery.service.FlooringMasteryInvalidFieldInputException;
 import com.flooringmastery.service.FlooringMasteryServiceLayer;
 import com.flooringmastery.ui.FlooringMasteryView;
 
@@ -19,8 +19,8 @@ public class FlooringMasteryController {
         this.service = service;
     }
 
-    public void run() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
-            FlooringMasteryInvalidFieldInput {
+    public void run() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInputException,
+            FlooringMasteryInvalidFieldInputException {
 
         boolean keepGoing = true;
         int menuSelection = 0;
@@ -74,8 +74,8 @@ public class FlooringMasteryController {
         view.displayMessage("Successfully Exported Data to file.");
     }
 
-    private void editAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
-            FlooringMasteryInvalidFieldInput {
+    private void editAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInputException,
+            FlooringMasteryInvalidFieldInputException {
         view.displayBanner("Edit An Order");
 
         // get list of orders for that date
@@ -107,13 +107,11 @@ public class FlooringMasteryController {
 
         }while(hasError);
 
-
-
     }
 
 
     private Order getNewFields(Order orderToEdit, int editOrderNumber)
-            throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput,
+            throws FlooringMasteryInvalidFieldInputException, FlooringMasteryInvalidDateInputException,
             FlooringMasteryPersistenceException {
         String newField = "";
         boolean hasError = false;
@@ -130,7 +128,7 @@ public class FlooringMasteryController {
                     }
                     hasError = false;
 
-                } catch (FlooringMasteryInvalidFieldInput e) {
+                } catch (FlooringMasteryInvalidFieldInputException e) {
                     hasError = true;
                     view.displayErrorMessage(e.getMessage());
                 }
@@ -142,15 +140,15 @@ public class FlooringMasteryController {
         return order;
     }
 
-    private void displayOrders() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
-            FlooringMasteryInvalidFieldInput {
+    private void displayOrders() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInputException,
+            FlooringMasteryInvalidFieldInputException {
         view.displayBanner("Display Orders");
         List<Order> getOrdersBasedOnDate = getOrderListForDate();
         view.displayOrders(getOrdersBasedOnDate);
     }
 
-    private void addAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
-            FlooringMasteryInvalidFieldInput {
+    private void addAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInputException,
+            FlooringMasteryInvalidFieldInputException {
         view.displayBanner("Add An Order");
 
         int newOrderNumber = service.getNewOrderNumber();
@@ -171,7 +169,7 @@ public class FlooringMasteryController {
                 Order newOrder = view.getNewOrderInfo(new Order(newOrderNumber));
                 processedOrder = service.processNewOrder(newOrder);
                 hasError = false;
-            } catch (FlooringMasteryInvalidDateInput | FlooringMasteryInvalidFieldInput e) {
+            } catch (FlooringMasteryInvalidDateInputException | FlooringMasteryInvalidFieldInputException e) {
                 view.displayErrorMessage(e.getMessage());
             }
 
@@ -185,8 +183,8 @@ public class FlooringMasteryController {
         view.displayMessage("\nSuccess: Order has been added.");
     }
 
-    private void removeAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInput,
-            FlooringMasteryInvalidFieldInput {
+    private void removeAnOrder() throws FlooringMasteryPersistenceException, FlooringMasteryInvalidDateInputException,
+            FlooringMasteryInvalidFieldInputException {
 
         view.displayBanner("Remove An Order");
 
@@ -222,7 +220,7 @@ public class FlooringMasteryController {
     }
 
     private List<Order> getOrderListForDate() throws FlooringMasteryPersistenceException,
-            FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
+            FlooringMasteryInvalidDateInputException, FlooringMasteryInvalidFieldInputException {
 
         List<Order> getOrdersBasedOnDate;
         boolean hasError = false;
@@ -245,7 +243,7 @@ public class FlooringMasteryController {
     }
 
     private void getAnswerToOrderPrompt(String input) throws FlooringMasteryPersistenceException,
-            FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput {
+            FlooringMasteryInvalidDateInputException, FlooringMasteryInvalidFieldInputException {
         boolean hasError = false;
         ;
         do {
@@ -265,7 +263,6 @@ public class FlooringMasteryController {
             }
 
         } while (hasError);
-
     }
 
     private int getMenuSelection() {
@@ -279,5 +276,4 @@ public class FlooringMasteryController {
     private void unknownCommand() {
         view.displayMessage("Error: Unknown Command!");
     }
-
 }

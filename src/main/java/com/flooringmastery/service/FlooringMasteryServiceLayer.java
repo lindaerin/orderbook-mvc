@@ -16,13 +16,13 @@ public interface FlooringMasteryServiceLayer {
 
     int getNewOrderNumber() throws FlooringMasteryPersistenceException;
 
-    Order processNewOrder(Order newOrder) throws FlooringMasteryInvalidDateInput, FlooringMasteryInvalidFieldInput;
+    Order processNewOrder(Order newOrder) throws FlooringMasteryInvalidDateInputException, FlooringMasteryInvalidFieldInputException;
 
     List<Product> getProductList() throws FlooringMasteryPersistenceException;
 
     void addNewOrder(Order processedOrder) throws FlooringMasteryPersistenceException;
 
-    Order editSelectedOrder(int editOrderNumber, int i, String newField) throws FlooringMasteryInvalidFieldInput, FlooringMasteryInvalidDateInput, FlooringMasteryPersistenceException;
+    Order editSelectedOrder(int editOrderNumber, int i, String newField) throws FlooringMasteryInvalidFieldInputException, FlooringMasteryInvalidDateInputException, FlooringMasteryPersistenceException;
 
     void exportAllData() throws FlooringMasteryPersistenceException;
 
