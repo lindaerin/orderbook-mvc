@@ -4,7 +4,7 @@
 
 ## Features
 * Import data from txt file
-* Add, Update, Remove from list of orders
+* Add, Update, Remove, Search from list of orders
 * Export an updated list to a new txt file
 
 ## Diagrams(UML & Flowchart)
