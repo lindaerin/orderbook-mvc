@@ -1,3 +1,0 @@
-OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
-4,Test,CA,25.00,Tile,190.0,3.50,4.15,665.00,788.50,363.38,1816.88,03-11-2025
-5,Another,WA,9.25,Wood,180.23,5.15,4.75,928.18,856.09,165.04,1949.31,03-11-2025
