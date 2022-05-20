@@ -8,8 +8,5 @@
 * Export an updated list to a new txt file
 
 ## Diagrams(UML Diagram)
-![a;t-text](https://github.com/lindaerin/orderbook-mvc/blob/main/Diagrams/UMLDiagram.png).resize(300, 347, {
-      kernel: sharp.kernel.cubic,
-      fit: 'cover',
-    }).toFile('dest.png');
+![a;t-text](https://github.com/lindaerin/orderbook-mvc/blob/main/Diagrams/UMLDiagram.png)
 
